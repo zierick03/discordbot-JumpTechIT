@@ -5,7 +5,7 @@ services:
 
 variables:
   DOCKER_DRIVER: overlay2
-  IMAGE_NAME: zierick03/discordbot
+  discordbot: zierick03/discordbot
 
 before_script:
   - apk update
@@ -20,13 +20,13 @@ stages:
 build:
   stage: build
   script:
-    - docker build -t $IMAGE_NAME:latest .
+    - docker build -t $discordbot:latest .
     - docker images
 
 test:
   stage: test
   script:
-    - docker run --rm $IMAGE_NAME:latest python3 --version
+    - docker run --rm $discordbot:latest python3 --version
 
 push:
   stage: push
@@ -34,4 +34,4 @@ push:
     - main
   script:
     - echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USERNAME" --password-stdin
-    - docker push $IMAGE_NAME:latest
+    - docker push $discordbot:latest
