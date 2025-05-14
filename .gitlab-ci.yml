@@ -9,7 +9,7 @@ stages:
 
 before_script:
   # Inloggen op Docker Hub met gebruikersnaam en wachtwoord/token via de variabelen
-  - echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USERNAME" --password-stdin
+  - docker login -u "$DOCKER_USERNAME" -p "$DOCKER_PASSWORD"  # Wijzig login methode hier
 
 build:
   stage: build
