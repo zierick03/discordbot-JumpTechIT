@@ -21,7 +21,7 @@ build:
   stage: build
   script:
     - docker info
-    - docker build --pull -t zierick03/Discordbot:latest .
+    - docker build --pull -t zierick03/discordbot:latest .
 
 test:
   stage: test
@@ -39,5 +39,6 @@ push:
   only:
     - main
   script:
-    - echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USERNAME" --password-stdin
-    - docker push zierick03/DiscordBot:latest
+    - docker login -u "$DOCKER_USERNAME" -p "$DOCKER_PASSWORD"
+    - docker tag discordbot zierick03/discordbot:latest
+    - docker push zierick03/discordbot:latest
