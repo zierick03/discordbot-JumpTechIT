@@ -2,12 +2,14 @@ image: docker:latest
 
 services:
   - docker:dind
-
+      
 variables:
   DOCKER_DRIVER: overlay2
   DOCKER_HOST: tcp://docker:2375  # Dit is de juiste instelling voor Docker-in-Docker
 
 before_script:
+  - sleep 10  # Wacht 10 seconden om ervoor te zorgen dat Docker goed is gestart
+  - docker info  # Controleer of Docker beschikbaar is
   - apk update
   - apk add --no-cache py3-pip python3-dev libffi-dev gcc libc-dev mariadb-dev
 
