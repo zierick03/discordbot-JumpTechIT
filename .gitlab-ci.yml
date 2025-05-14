@@ -1,27 +1,49 @@
 image: docker:latest
 
+# Geen dind meer nodig, we gebruiken host-Docker via socket
+services: []
+
+variables:
+  DOCKER_HOST: "unix:///var/run/docker.sock"
+  # Sla je Hub-credentials op in CI/CD Settings → Variables
+  # Zet hier nooit je wachtwoord in de repo!
+  # DOCKER_USERNAME: jouw_dockerhub_gebruiker
+  # DOCKER_PASSWORD: jouw_dockerhub_password
+
 stages:
+  - prepare
   - build
   - test
   - push
 
-before_script:
-  - docker info
+prepare:
+  stage: prepare
+  script:
+    - echo "Inloggen op Docker Hub om pulls te authenticeren"
+    - echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USERNAME" --password-stdin
 
 build:
   stage: build
+  before_script:
+    - docker info
   script:
-    - docker build -t zierick03/discordbot:latest .
+    - echo "Bouw de Docker-image"
+    - docker build --pull -t zierick03/discordbot:latest .
 
 test:
   stage: test
   script:
+    - echo "Uitvoeren van unit tests"
+    - python3 -m pip install --upgrade pip
     - python3 -m pip install -r requirements.txt pytest pytest-cov
     # - pytest tests/
 
+  coverage: '/TOTAL.*?(\d+\%)/'
+
 push:
   stage: push
-  only: [main]
+  only:
+    - main
   script:
-    - echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USERNAME" --password-stdin
+    - echo "Image naar Docker Hub pushen"
     - docker push zierick03/discordbot:latest
