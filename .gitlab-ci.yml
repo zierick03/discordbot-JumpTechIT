@@ -4,8 +4,9 @@ stages:
 
 before_script:
   # Docker login
-    - echo "Inloggen op Docker Hub om pulls te authenticeren"
-    - docker login -u "$DOCKER_USERNAME" -p "$DOCKER_PASSWORD"
+  - echo "Inloggen op Docker Hub om pulls te authenticeren"
+  - echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USERNAME" --password-stdin
+
 
 build:
   stage: build
