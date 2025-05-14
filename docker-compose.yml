@@ -1,25 +1,18 @@
 version: '3'
-
 services:
-  app:
+  discordbot:
     build: .
     ports:
       - "5000:5000"
-    environment:
-      - DB_HOST=db
-      - DB_NAME=jouw_database_naam
-      - DB_USER=root
-      - DB_PASSWORD=root_password
     depends_on:
-      - db
-
-  db:
-    image: mysql:5.7
+      - mysql
     environment:
-      MYSQL_ROOT_PASSWORD: root_password
-      MYSQL_DATABASE: jouw_database_naam
-    volumes:
-      - db_data:/var/lib/mysql
+      DISCORD_TOKEN: "MTM2MTk3NDAzNjQyMjIwMTM4NA.GVvq-F.C22fIfMfMyFyiv3FTNQzZAAUeR_bj43idbibPw"  # Voeg je eigen Discord token hier in
 
-volumes:
-  db_data:
+  mysql:
+    image: mysql:8.0
+    environment:
+      MYSQL_ROOT_PASSWORD: example
+      MYSQL_DATABASE: discordbot_db  # Naam van je database
+    ports:
+      - "3306:3306"

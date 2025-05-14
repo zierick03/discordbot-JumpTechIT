@@ -1,19 +1,20 @@
-# Gebruik Python 3.11.9 als basis image
-FROM python:3.11.9-slim
+# Gebruik een officieel Python 3.11.9 image
+FROM python:3.11.9-alpine
 
-# Zet de werkdirectory binnen de container
-WORKDIR /app
+# Maak een directory voor je app in de container
+WORKDIR /bot
 
-# Kopieer de requirements file en installeer de dependencies
-COPY requirements.txt .
+# Kopieer je requirements.txt bestand naar de container
+COPY requirements.txt /bot/requirements.txt
 
-RUN pip install --no-cache-dir -r requirements.txt
+# Installeer de Python-afhankelijkheden
+RUN pip install --no-cache-dir -r /bot/requirements.txt
 
-# Kopieer de applicatiecode naar de container
-COPY . .
+# Kopieer je hele applicatie (inclusief de botcode) naar de container
+COPY . /bot
 
-# Open de poort waarop de applicatie draait
-EXPOSE 5000
+# Stel de poort in waarop de bot draait (dit is niet noodzakelijk voor de bot zelf, maar kan nuttig zijn)
+EXPOSE 8080
 
-# Zorg ervoor dat de app start bij het uitvoeren van de container
-CMD ["python", "app.py"]
+# Het commando om de bot uit te voeren
+CMD ["python", "bot.py"]
