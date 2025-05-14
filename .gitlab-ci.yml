@@ -5,7 +5,7 @@ services:
 
 variables:
   DOCKER_DRIVER: overlay2
-zierick03/discordbot: zierick03/discordbot
+
 
 before_script:
   - apk update
