@@ -1,7 +1,11 @@
 #pip install discord.py (uitvoeren in powershell)
+#pip install discord.py
+
 import discord
 import random
+import sqlite3
 from discord.ext import commands
+
 
 # Bot setup met intents
 intents = discord.Intents.default()
@@ -66,6 +70,58 @@ async def contact(interaction: discord.Interaction):
         linkedin  Jumptech-it
     """
     await interaction.response.send_message(contact_info)
+    
+    # Slash-commando: FAQ lijst tonen
+@bot.tree.command(name="faq", description="Toon een lijst met veelgestelde vragen")
+async def faq(interaction: discord.Interaction):
+    # Verbind met SQLite database
+    conn = sqlite3.connect("faq.db")
+    cursor = conn.cursor()
+
+    # Haal alle vragen op uit de FAQ-tabel
+    cursor.execute("SELECT id, vraag FROM faq")
+    vragen = cursor.fetchall()
+    conn.close()
+
+    # Check of er vragen zijn gevonden
+    if not vragen:
+        await interaction.response.send_message("Er zijn momenteel geen FAQ-vragen beschikbaar.")
+        return
+
+    # Bouw het antwoord op met alle vragen
+    antwoord = "**Veelgestelde Vragen (FAQ):**\n"
+    for id, vraag in vragen:
+        antwoord += f"{id}. {vraag}\n"
+
+    # Voeg instructie toe
+    antwoord += "\nGebruik `/faq_antwoord <nummer>` om het antwoord te zien."
+
+    # Stuur de lijst met vragen naar Discord
+    await interaction.response.send_message(antwoord)
+
+# Slash-commando: Antwoord op een specifieke vraag opvragen
+@bot.tree.command(name="faq_antwoord", description="Geef antwoord op een specifieke FAQ-vraag")
+async def faq_antwoord(interaction: discord.Interaction, nummer: int):
+    # Verbind met SQLite database
+    conn = sqlite3.connect("faq.db")
+    cursor = conn.cursor()
+
+    # Haal het antwoord op voor de meegegeven vraag-ID
+    cursor.execute("SELECT antwoord FROM faq WHERE id = ?", (nummer,))
+    row = cursor.fetchone()
+    conn.close()
+
+    # Als het antwoord bestaat, stuur het terug naar de gebruiker
+    if row:
+        await interaction.response.send_message(f"💬 Antwoord op vraag {nummer}:\n{row[0]}")
+    else:
+        # Als het ID niet bestaat, geef een foutmelding
+        await interaction.response.send_message(f"❌ Geen antwoord gevonden voor vraag {nummer}.")
+
+    
+    
+    
+    
     
 # Start de bot
 bot.run("MTM2MTk3NDAzNjQyMjIwMTM4NA.GVvq-F.C22fIfMfMyFyiv3FTNQzZAAUeR_bj43idbibPw")  # Vergeet je token niet in te vullen!

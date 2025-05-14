@@ -1,0 +1,12 @@
+import sqlite3
+
+conn = sqlite3.connect("faq.db")
+cursor = conn.cursor()
+
+cursor.execute("SELECT id, vraag, antwoord FROM faq")
+rows = cursor.fetchall()
+
+for row in rows:
+    print(f"{row[0]}. {row[1]}\n-> {row[2]}\n")
+
+conn.close()
