@@ -2,39 +2,18 @@ image: docker:latest
 
 services:
   - docker:dind
-      
+
 variables:
   DOCKER_DRIVER: overlay2
-  DOCKER_HOST: tcp://docker:2375  # Dit is de juiste instelling voor Docker-in-Docker
+  DOCKER_TLS_CERTDIR: ""  # belangrijk om TLS fouten te vermijden
 
 before_script:
-  - sleep 10  # Wacht 10 seconden om ervoor te zorgen dat Docker goed is gestart
-  - docker info  # Controleer of Docker beschikbaar is
-  - apk update
-  - apk add --no-cache py3-pip python3-dev libffi-dev gcc libc-dev mariadb-dev
-
+  - echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USERNAME" --password-stdin
 
 stages:
-  - build
   - test
-  - push
 
-build:
-  stage: build
-  script:
-    - docker info # controle of doccker deamon bereikbaar is 
-    - docker build -t zierick03/discordbot:latest .
-    - docker images
-
-test:
+test-docker:
   stage: test
   script:
-    - docker run --rm zierick03/discordbot:latest python3 --version
-
-push:
-  stage: push
-  only:
-    - main
-  script:
-    - echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USERNAME" --password-stdin
-    - docker push zierick03/discordbot:latest
+    - docker info
