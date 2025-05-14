@@ -1,48 +1,27 @@
 image: docker:latest
 
-services:
-  - name: docker:dind
-    alias: docker
-
-variables:
-  DOCKER_DRIVER: overlay2
-  DOCKER_TLS_CERTDIR: ""
-
 stages:
   - build
   - test
   - push
 
 before_script:
-  # Systeemafhankelijkheden voor Python en MySQL client
-  - apk update
-  - apk add --no-cache py3-pip python3-dev libffi-dev gcc libc-dev mariadb-dev
+  - docker info
 
 build:
   stage: build
   script:
-    - echo "Verbinding testen met Docker daemon"
-    - docker info
-    - docker build --pull -t zierick03/discordbot:latest .
+    - docker build -t zierick03/discordbot:latest .
 
 test:
   stage: test
   script:
-    - python3 -m venv venv
-    - . venv/bin/activate
-    - pip install --upgrade pip
-    - pip install -r requirements.txt
-    - pip install pytest pytest-cov
-    # - pytest tests/ --junitxml=report.xml --cov=app
-
-  # Optioneel: test coverage pattern
-  coverage: '/TOTAL.*?(\d+\%)/'
+    - python3 -m pip install -r requirements.txt pytest pytest-cov
+    # - pytest tests/
 
 push:
   stage: push
-  only:
-    - main
+  only: [main]
   script:
-    - echo "Inloggen op Docker Hub"
     - echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USERNAME" --password-stdin
     - docker push zierick03/discordbot:latest
