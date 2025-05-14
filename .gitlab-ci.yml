@@ -1,0 +1,43 @@
+image: docker:latest
+
+services:
+  - docker:dind
+
+variables:
+  DOCKER_DRIVER: overlay2
+  DOCKER_TLS_CERTDIR: ""
+
+stages:
+  - build
+  - test
+  - push
+
+before_script:
+  # Voeg noodzakelijke systeemafhankelijkheden toe voor MySQL/MariaDB client
+  - apk update
+  - apk add --no-cache py3-pip python3-dev libffi-dev gcc libc-dev mariadb-dev
+
+build:
+  stage: build
+  script:
+    - docker info
+    - docker build --pull -t zierick03/Discordbot:latest .
+
+test:
+  stage: test
+  script:
+    - python3 -m venv venv
+    - . venv/bin/activate
+    - pip install --upgrade pip
+    - pip install -r requirements.txt  # Zorg ervoor dat je requirements.txt het juiste bevat
+    - pip install pytest pytest-cov
+    #- pytest tests/ --junitxml=report.xml --cov=app  # Specificeer de locatie van tests
+  coverage: '/TOTAL.*?(\d+\%)/'
+
+push:
+  stage: push
+  only:
+    - main
+  script:
+    - echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USERNAME" --password-stdin
+    - docker push zierick03/DiscordBot:latest

@@ -10,8 +10,8 @@ from discord.ext import commands
 def get_mysql_connection():
     return mysql.connector.connect(
         host="localhost",
-        user="root",            # Pas aan als nodig
-        password="P@ssword",    # Pas aan als nodig
+        user="root",            # Pas aan als nodig niet veilig dat weet ik 
+        password="P@ssword",    # Pas aan als nodig niet veilig dat weet ik 
         database="discordbot"
     )
 
