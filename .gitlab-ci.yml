@@ -1,3 +1,5 @@
+image: docker:latest
+
 stages:
   - build
   - deploy
@@ -8,7 +10,9 @@ variables:
 build:
   stage: build
   script:
+    - echo "Controleer host-Docker"
     - docker info
+    - echo "Bouwen image"
     - docker build -t "$IMAGE" .
 
 deploy:
@@ -16,5 +20,7 @@ deploy:
   only:
     - main
   script:
+    - echo "Inloggen op Docker Hub"
     - echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USER" --password-stdin
+    - echo "Pushen image"
     - docker push "$IMAGE"
