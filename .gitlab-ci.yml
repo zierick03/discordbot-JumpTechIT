@@ -1,32 +1,24 @@
-image: docker:latest
-
-services:
-  - name: docker:dind
-    command: ["--tls=false"]
-
-variables:
-  DOCKER_TLS_CERTDIR: ""
-  DOCKER_HOST: tcp://docker:2375
-  DOCKER_DRIVER: overlay2
-
-before_script:
-  - echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USER" --password-stdin
-
 stages:
   - build
   - deploy
 
+variables:
+  IMAGE: "$DOCKER_USER/discordbot:latest"
+
 build:
   stage: build
-  privileged: true
   script:
-    - docker build -t $DOCKER_USER/discordbot:latest .
-    - docker push $DOCKER_USER/discordbot:latest
+    - echo "Controleren of Docker-daemon draait"
+    - docker info
+    - echo "Bouwen van Docker-image"
+    - docker build -t "$IMAGE" .
 
 deploy:
   stage: deploy
-  privileged: true
-  script:
-    - echo "Deploying..."
   only:
     - main
+  script:
+    - echo "Inloggen op Docker Hub"
+    - echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USER" --password-stdin
+    - echo "Pushen van $IMAGE"
+    - docker push "$IMAGE"
