@@ -8,7 +8,7 @@ variables:
   DOCKER_TLS_CERTDIR: ""  # voorkomt TLS problemen bij dind
 
 before_script:
-  - echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USERNAME" --password-stdin
+  - echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USER" --password-stdin
 
 stages:
   - test
