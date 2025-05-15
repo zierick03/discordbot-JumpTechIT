@@ -1,44 +1,26 @@
-image: docker:latest
-
-services:
-  - docker:dind
-
-variables:
-  DOCKER_DRIVER: overlay2
-  DOCKER_TLS_CERTDIR: ""  # voorkomt TLS problemen bij dind
-
-before_script:
-  - echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USER" --password-stdin
+# .gitlab-ci.yml
+# Zorg dat deze tag overeenkomt met wat je bij register hebt ingesteld:
+# bijv. tags: ["shell"]
 
 stages:
-  - test
   - build
   - deploy
 
-test:
-  stage: test
+build:
+  stage: build
+  tags:
+    - shell
   script:
     - docker info
     - docker version
-
-build:
-  stage: build
-  script:
     - docker build -t $DOCKER_USER/discordbot:latest .
-    - docker images
 
 deploy:
   stage: deploy
+  tags:
+    - shell
   only:
-    - main  # alleen uitvoeren vanaf de 'main' branch
+    - main
   script:
+    - echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USER" --password-stdin
     - docker push $DOCKER_USER/discordbot:latest
-
-
-
-
-
-
-
-
-
