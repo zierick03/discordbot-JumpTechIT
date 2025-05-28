@@ -140,4 +140,4 @@ bot.run("MTM2MTk3NDAzNjQyMjIwMTM4NA.GVvq-F.C22fIfMfMyFyiv3FTNQzZAAUeR_bj43idbibP
 # ('Retourneren?', 'Binnen 14 dagen mits ongebruikt.'),
 # ('Duurzaam?', 'Ja, we richten ons op duurzaamheid.'),
 # ('Werken jullie op locatie?', 'Ja, op afstand en locatie.');
-####################################################################################################################################################
+
