@@ -18,14 +18,17 @@
 #/update titel:Belangrijke Update inhoud:De nieuwe feature is live vanaf maandag!
 
 
-#/poll vraag:Wat wil je eten? opties:Pizza,Sushi,Burger
-
-
+#alleen mogelijk  op server waar bot op draait
 # /systemscan         – Haalt systeeminformatie op via het 'systeminfo'-commando (Windows-only)
 # /myip               – Toont het externe IP-adres van de machine waarop de bot draait
 # /traceroute <host>  – Voert een traceroute uit naar de opgegeven host (platform-afhankelijk)
 
+#nog niet werkend 
+#/poll vraag:Wat wil je eten? opties:Pizza,Sushi,Burger
 
+
+#automatische 
+#ieder minuur server update 
 
 import discord
 import random
@@ -33,12 +36,19 @@ import socket  # Voor DNS-resolutie
 import urllib.request  # Voor IP-opvraag
 import mysql.connector
 from discord.ext import commands
+from discord import app_commands
 import subprocess
 from discord.ext import tasks
 import psutil
 import datetime
 
 
+
+
+
+
+# Kanaal-ID waar dashboard gepost wordt
+DASHBOARD_CHANNEL_ID = 1379833746701684776  # Vervang door jouw kanaal-ID
 
 
 # MySQL-verbinding
@@ -57,12 +67,8 @@ intents.members = True
 
 bot = commands.Bot(command_prefix=["/", "!"], intents=intents)
 
-# Event: Bot is online
-@bot.event
-async def on_ready():
-    print(f'✅ Bot is online als: {bot.user}')
-    await bot.tree.sync()  # Slash-commands synchroniseren
-    print("✅ Slash-commando's zijn gesynchroniseerd!")
+  
+    
 
 # Normale prefix-commando's
 @bot.command()
@@ -141,7 +147,7 @@ async def contact(interaction: discord.Interaction):
     """
     await interaction.response.send_message(contact_info)
 
-#systeminfo 
+#haalt al je PC gebruik op werkt alleen als de bot op jouw PC draait /systeminfo 
 @bot.command()
 async def systemscan(ctx):
     """Haalt basis systeeminformatie op via systeminfo (alleen Windows)."""
@@ -194,7 +200,7 @@ async def faq_antwoord(interaction: discord.Interaction, nummer: int):
         await interaction.response.send_message("❌ Geen antwoord gevonden voor vraag {nummer}.")
 
 
-#automatisch nieuwsupdates /updates
+#nieuwsupdates invoegen  /updates
 @bot.tree.command(name="update", description="Post een nieuwsupdate of aankondiging")
 async def update(interaction: discord.Interaction, titel: str, inhoud: str):
     embed = discord.Embed(
@@ -210,47 +216,55 @@ async def update(interaction: discord.Interaction, titel: str, inhoud: str):
 
 
 
-
-
-
-
-
-# Start de bot
-bot.run("MTM2MTk3NDAzNjQyMjIwMTM4NA.GVvq-F.C22fIfMfMyFyiv3FTNQzZAAUeR_bj43idbibPw")  # Vergeet je token niet te beveiligen!
-
-
-
-
-#werkt nog niet 
-
-
-#poll lijsten 
-@bot.tree.command(name="poll", description="Maak een poll met 2-10 opties, gescheiden door komma's")
-async def poll(interaction: discord.Interaction, vraag: str, opties: str):
-    optie_lijst = [opt.strip() for opt in opties.split(",")]
-    if len(optie_lijst) < 2 or len(optie_lijst) > 10:
-        await interaction.response.send_message("❌ Geef tussen de 2 en 10 opties op, gescheiden door komma's.", ephemeral=True)
-        return
-    emoji_list = ['1️⃣', '2️⃣', '3️⃣', '4️⃣', '5️⃣', '6️⃣', '7️⃣', '8️⃣', '9️⃣', '🔟']
-    beschrijving = ""
-    for i, optie in enumerate(optie_lijst):
-        beschrijving += f"{emoji_list[i]} {optie}\n"
+#onderhoud invoegen  /onderhoud
+@bot.tree.command(name="onderhoud", description="Post een onderhoud of aankondiging")
+async def update(interaction: discord.Interaction, titel: str, inhoud: str):
     embed = discord.Embed(
-        title="📊 Poll",
-        description=f"**{vraag}**\n\n{beschrijving}",
-        color=discord.Color.blue()
+        title=f"🔧 {titel}",
+        description=inhoud,
+        color=discord.Color.orange()
     )
-    embed.set_footer(text=f"Gemaakt door: {interaction.user.display_name}")
-    poll_bericht = await interaction.response.send_message(embed=embed, fetch_reply=True)
-    for i in range(len(optie_lijst)):
-        await poll_bericht.add_reaction(emoji_list[i])
+    embed.set_footer(text=f"Gepost door: {interaction.user.display_name}")
+    embed.timestamp = interaction.created_at
+
+    await interaction.channel.send(embed=embed)
+    await interaction.response.send_message("✅ Aankondiging geplaatst!", ephemeral=True)
 
 
 
+# Functie die het dashboard update (zonder loop)
+
+# # Slash command om het dashboard handmatig te updaten
+# @bot.tree.command(name="update_dashboard", description="Update het dashboard handmatig")
+# async def update_dashboard_command(interaction: discord.Interaction):
+#     await send_or_update_dashboard()
+#     await interaction.response.send_message("✅ Dashboard is bijgewerkt!", ephemeral=True)
+
+
+#als je hem opstart 
+async def send_or_update_dashboard():
+    global dashboard_message
+    channel = bot.get_channel(1379833746701684776)
+    if channel is None:
+        print("⚠️ Dashboard kanaal niet gevonden!")
+        return
+
+    stats_text = get_system_stats()
+    embed = discord.Embed(title="📊 Dashboard", description=stats_text, color=discord.Color.green())
+    embed.timestamp = datetime.datetime.now()
+
+
+    if dashboard_message is None:
+        dashboard_message = await channel.send(embed=embed)
+    else:
+        try:
+            await dashboard_message.edit(embed=embed)
+        except discord.NotFound:
+            dashboard_message = await channel.send(embed=embed)
 
 
 # Kanaal-ID waar dashboard gepost wordt aankondigings kanaalen (updates)
-DASHBOARD_CHANNEL_ID = 1379791761731358730  # Vervang door jouw kanaal-ID
+DASHBOARD_CHANNEL_ID = 1379833746701684776  # Vervang door jouw kanaal-ID
 
 dashboard_message = None  # Dit bewaren we zodat we het bericht kunnen updaten
 
@@ -268,6 +282,7 @@ def get_system_stats():
     )
     return stats
 
+#per minuut 
 @tasks.loop(minutes=1)
 async def update_dashboard():
     global dashboard_message
@@ -278,7 +293,8 @@ async def update_dashboard():
 
     stats_text = get_system_stats()
     embed = discord.Embed(title="📊 Dashboard", description=stats_text, color=discord.Color.green())
-    embed.timestamp = datetime.datetime.utcnow()
+    embed.timestamp = datetime.datetime.now()
+
 
     if dashboard_message is None:
         dashboard_message = await channel.send(embed=embed)
@@ -288,16 +304,84 @@ async def update_dashboard():
         except discord.NotFound:
             # Bericht is verwijderd, stuur een nieuw bericht
             dashboard_message = await channel.send(embed=embed)
+            update_dashboard.start()
 
+            
+            
+
+
+
+
+
+
+#werkt nog niet 
+
+
+#poll lijsten 
+
+
+@bot.tree.command(name="poll", description="Maak een poll met 2-10 opties, gescheiden door komma's")
+async def poll(interaction: discord.Interaction, vraag: str, opties: str):
+    optie_lijst = [opt.strip() for opt in opties.split(",")]
+    if len(optie_lijst) < 2 or len(optie_lijst) > 10:
+        await interaction.response.send_message(
+            "❌ Geef tussen de 2 en 10 opties op, gescheiden door komma's.",
+            ephemeral=True
+        )
+        return
+
+    emoji_list = ['1️⃣', '2️⃣', '3️⃣', '4️⃣', '5️⃣', '6️⃣', '7️⃣', '8️⃣', '9️⃣', '🔟']
+    beschrijving = "\n".join(f"{emoji_list[i]} {opt}" for i, opt in enumerate(optie_lijst))
+
+    embed = discord.Embed(
+        title="📊 Poll",
+        description=f"**{vraag}**\n\n{beschrijving}",
+        color=discord.Color.blue()
+    )
+    embed.set_footer(text=f"Gemaakt door: {interaction.user.display_name}")
+    embed.timestamp = interaction.created_at
+
+    await interaction.response.send_message(embed=embed)
+    bericht = await interaction.original_response()
+
+    for i in range(len(optie_lijst)):
+        await bericht.add_reaction(emoji_list[i])
+
+        
+  
+    #poll werkend krijgen 
+
+
+# @bot.event
+# async def on_ready():
+#     await bot.tree.sync()
+#     print(f"{bot.user} is online en slash commands zijn gesynchroniseerd.")
+
+
+
+
+
+            
+
+
+            
+            
+            
+            
+# Event: Bot is online
 @bot.event
 async def on_ready():
     print(f'✅ Bot is online als: {bot.user}')
-    await bot.tree.sync()
+    await bot.tree.sync() #slash commando synchroniseren 
     print("✅ Slash-commando's zijn gesynchroniseerd!")
+
+
+    # Stuur bericht naar een kanaal
+    channel = bot.get_channel(1379833746701684776)
+    if channel:
+        await channel.send("✅ Bot is opnieuw opgestart en klaar om te gebruiken!")
     update_dashboard.start()
 
 
-
-
-
-
+# Start de bot
+bot.run("MTM2MTk3NDAzNjQyMjIwMTM4NA.GVvq-F.C22fIfMfMyFyiv3FTNQzZAAUeR_bj43idbibPw")  # Vergeet je token niet te beveiligen!
