@@ -4,13 +4,29 @@
 
 #aanmaken database
 
+# ✅ Slash-commando overzicht:
+
+# /hoi                – Zegt hoi tegen de gebruiker
+# /hallo              – Groet de gebruiker vriendelijk
+# /ping               – Test de latency van de bot
+# /randomgetal        – Genereert een willekeurig getal tussen opgegeven grenzen
+# /contact            – Toont contactinformatie van JumpTechIT
+# /faq                – Toont een lijst met veelgestelde vragen uit de database
+# /faq_antwoord       – Geeft antwoord op een specifieke veelgestelde vraag
+
+# /systemscan         – Haalt systeeminformatie op via het 'systeminfo'-commando (Windows-only)
+# /myip               – Toont het externe IP-adres van de machine waarop de bot draait
+# /traceroute <host>  – Voert een traceroute uit naar de opgegeven host (platform-afhankelijk)
 
 
 
 import discord
 import random
+import socket  # Voor DNS-resolutie
+import urllib.request  # Voor IP-opvraag
 import mysql.connector
 from discord.ext import commands
+import subprocess
 
 # MySQL-verbinding
 def get_mysql_connection():
@@ -52,7 +68,37 @@ async def ping(ctx):
 async def randomgetal(ctx, start: int, einde: int):
     getal = random.randint(start, einde)
     await ctx.send(f'Het willekeurige getal tussen {start} en {einde} is: {getal}')
+    
+@bot.command()
+async def myip(ctx):
+    """Geeft het externe IP-adres van de machine waarop de bot draait."""
+    try:
+        ip = urllib.request.urlopen('https://api.ipify.org').read().decode('utf8')
+        await ctx.send(f"🌐 Extern IP-adres: `{ip}`")
+    except Exception as e:
+        await ctx.send(f"❌ Fout bij ophalen van IP-adres:\n```{str(e)}```")
 
+@bot.command()
+async def traceroute(ctx, host: str):
+    """Voert een traceroute uit naar een opgegeven host (bv. google.com)."""
+    try:
+        # Gebruik platform-afhankelijke commando’s
+        import platform
+        if platform.system() == "Windows":
+            cmd = f"tracert {host}"
+        else:
+            cmd = f"traceroute {host}"
+        
+        resultaat = subprocess.check_output(cmd, shell=True, text=True, stderr=subprocess.STDOUT)
+        # Splits output op in Discord-vriendelijke blokken
+        MAX_DISCORD_LENGTH = 1900
+        for i in range(0, len(resultaat), MAX_DISCORD_LENGTH):
+            await ctx.send(f"```{resultaat[i:i+MAX_DISCORD_LENGTH]}```")
+    except subprocess.CalledProcessError as e:
+        await ctx.send(f"❌ Fout tijdens traceroute:\n```{e.output}```")
+    except Exception as e:
+        await ctx.send(f"❌ Onbekende fout:\n```{str(e)}```")
+        
 # Slash-commando's
 @bot.tree.command(name="hoi", description="Zegt hoi tegen de gebruiker")
 async def slash_hoi(interaction: discord.Interaction):
@@ -81,6 +127,22 @@ async def contact(interaction: discord.Interaction):
 🔗 LinkedIn: Jumptech-it
     """
     await interaction.response.send_message(contact_info)
+
+#systeminfo 
+@bot.command()
+async def systemscan(ctx):
+    """Haalt basis systeeminformatie op via systeminfo (alleen Windows)."""
+    try:
+        # Voer 'systeminfo' uit via subprocess
+        resultaat = subprocess.check_output("systeminfo", shell=True, text=True, stderr=subprocess.STDOUT)
+        # Discord heeft limieten, splits resultaat op in stukken van max 1900 tekens
+        MAX_DISCORD_LENGTH = 1900
+        for i in range(0, len(resultaat), MAX_DISCORD_LENGTH):
+            await ctx.send(f"```{resultaat[i:i+MAX_DISCORD_LENGTH]}```")
+    except subprocess.CalledProcessError as e:
+        await ctx.send(f"❌ Fout bij ophalen van systeeminfo:\n```{e.output}```")
+    except Exception as e:
+        await ctx.send(f"❌ Onbekende fout:\n```{str(e)}```")
 
 # Slash-commando voor FAQ-lijst
 @bot.tree.command(name="faq", description="Toon een lijst met veelgestelde vragen")
