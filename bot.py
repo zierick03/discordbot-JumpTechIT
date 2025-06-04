@@ -307,19 +307,7 @@ async def update_dashboard():
             update_dashboard.start()
 
             
-            
-
-
-
-
-
-
-#werkt nog niet 
-
-
 #poll lijsten 
-
-
 @bot.tree.command(name="poll", description="Maak een poll met 2-10 opties, gescheiden door komma's")
 async def poll(interaction: discord.Interaction, vraag: str, opties: str):
     optie_lijst = [opt.strip() for opt in opties.split(",")]
@@ -349,13 +337,7 @@ async def poll(interaction: discord.Interaction, vraag: str, opties: str):
 
         
   
-    #poll werkend krijgen 
-
-
-# @bot.event
-# async def on_ready():
-#     await bot.tree.sync()
-#     print(f"{bot.user} is online en slash commands zijn gesynchroniseerd.")
+ 
 
 
 
