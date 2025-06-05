@@ -372,10 +372,16 @@ async def daily(interaction: discord.Interaction):
     # Voeg XP of coins toe in een database
     await interaction.response.send_message("🎁 Je hebt 100 coins ontvangen!")
     
+    
+    
+    #zegt nog steeds 0 hij slaat hem of niet goed op of hij hjaalt hem verkeerdt op 
+    
 #coins aantal zien  /coins
 @bot.tree.command(name="coins", description="Bekijk hoeveel coins je hebt")
 async def coins(interaction: discord.Interaction):
     user_id = str(interaction.user.id)
+    #waarom staat er hier een null/0
+    #mmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmmm
     coins = user_data.get(user_id, 0)
     
     await interaction.response.send_message(
@@ -446,13 +452,8 @@ async def addevent(interaction: discord.Interaction, naam: str, tijd: str):
     # 1 uur van tevoren
     await wait_and_send(3600, f"🔔 Herinnering: Event '**{naam}**' begint over 1 uur! (aangemaakt door {interaction.user.mention})")
         
-        
-        
 
 
-
-
-                  
 # Event: Bot is online
 @bot.event
 async def on_ready():
