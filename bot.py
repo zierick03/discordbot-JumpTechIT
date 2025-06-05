@@ -393,7 +393,7 @@ async def coins(interaction: discord.Interaction):
 
 
 
-#geeft alleen terug als nij angemaakt is andere pakt hij niet mee 
+#staat op utc == amsterdam -2 uur kijken of ik dat kan aanpassen 
     
 #add event /addevent    
 
