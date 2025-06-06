@@ -17,6 +17,16 @@
 # /faq_antwoord       – Geeft antwoord op een specifieke veelgestelde vraag
 #/update titel:Belangrijke Update inhoud:De nieuwe feature is live vanaf maandag!
 #/poll vraag:Wat wil je eten? opties:Pizza,Sushi,Burger
+#/rpg rock papaer
+#/
+#/
+#/coins 
+#/daily
+#/dashboard
+#/updates
+#/event
+#/onderhoud
+#/avater
 
 #alleen mogelijk  op server waar bot op draait
 # /systemscan         – Haalt systeeminformatie op via het 'systeminfo'-commando (Windows-only)
@@ -36,6 +46,7 @@ from discord.ext import tasks
 import psutil
 import datetime
 import asyncio
+
 
 # Kanaal-ID waar dashboard gepost wordt
 DASHBOARD_CHANNEL_ID = 1379833746701684776  # Vervang door jouw kanaal-ID
@@ -373,7 +384,31 @@ async def daily(interaction: discord.Interaction):
     await interaction.response.send_message("🎁 Je hebt 100 coins ontvangen!")
     
     
-    
+    #HAALT DE PROFIELFOTO VAN LEDEN OP 
+@bot.event
+async def on_ready():
+    await bot.tree.sync()
+    print(f"Ingelogd als {bot.user}")
+    #HOORT BIJ ELKAAR
+@bot.tree.command(name="avatar", description="Bekijk de profielfoto van een gebruiker.")
+@app_commands.describe(lid="De gebruiker waarvan je de avatar wilt zien")
+async def avatar(interaction: discord.Interaction, lid: discord.Member = None):
+    lid = lid or interaction.user
+    embed = discord.Embed(
+        title=f"🖼️ Avatar van {lid.display_name}",
+        color=discord.Color.blue()
+    )
+    embed.set_image(url=lid.display_avatar.url)
+    await interaction.response.send_message(embed=embed)
+
+
+
+
+
+
+
+#werkt nog niet optimaal
+
     #zegt nog steeds 0 hij slaat hem of niet goed op of hij hjaalt hem verkeerdt op 
     
 #coins aantal zien  /coins
@@ -388,14 +423,6 @@ async def coins(interaction: discord.Interaction):
         f"💸 {interaction.user.mention}, je hebt momenteel **{coins} coins**!",
         ephemeral=False
     )
-
-
-
-
-
-
-
-#werkt nog niet optimaal
 
 
 
