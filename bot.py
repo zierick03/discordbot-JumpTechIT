@@ -496,5 +496,5 @@ async def on_ready():
     update_dashboard.start()
 
 
-# Start de bot
+# Start de botf
 bot.run("MTM2MTk3NDAzNjQyMjIwMTM4NA.GVvq-F.C22fIfMfMyFyiv3FTNQzZAAUeR_bj43idbibPw")  # Vergeet je token niet te beveiligen!
