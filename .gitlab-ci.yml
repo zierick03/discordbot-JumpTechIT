@@ -1,0 +1,26 @@
+image: docker:latest
+
+stages:
+  - build
+  - deploy
+
+variables:
+  IMAGE: "$DOCKER_USER/discordbot:latest"
+
+build:
+  stage: build
+  script:
+    - echo "Controleer host-Docker"
+    - docker info
+    - echo "Bouwen image"
+    - docker build -t "$IMAGE" .
+
+deploy:
+  stage: deploy
+  only:
+    - main
+  script:
+    - echo "Inloggen op Docker Hub"
+    - echo "$DOCKER_PASSWORD" | docker login -u "$DOCKER_USER" --password-stdin
+    - echo "Pushen image"
+    - docker push "$IMAGE"

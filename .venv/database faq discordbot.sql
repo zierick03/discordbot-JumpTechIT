@@ -1,0 +1,20 @@
+CREATE DATABASE IF NOT EXISTS discordbot;
+USE discordbot;
+
+CREATE TABLE IF NOT EXISTS faq (
+    id INT AUTO_INCREMENT PRIMARY KEY,
+    vraag TEXT NOT NULL,
+    antwoord TEXT NOT NULL
+);
+
+INSERT INTO faq (vraag, antwoord) VALUES
+('Wat zijn jullie openingstijden?', 'We zijn geopend van maandag t/m vrijdag van 09:00 tot 17:00.'),
+('Hoe neem ik contact op?', 'Mail naar info@example.com of bel 0123-456789.'),
+('Waar is jullie kantoor?', 'Hoofdstraat 123, Eindhoven.'),
+('Bieden jullie support?', 'Ja, via mail en telefoon.'),
+('Hoe maak ik een afspraak?', 'Via onze website of telefonisch.'),
+('Nieuwsbrief?', 'Ja, aanmelden via de website.'),
+('Betaalmogelijkheden?', 'iDEAL, PayPal en creditcard.'),
+('Retourneren?', 'Binnen 14 dagen mits ongebruikt.'),
+('Duurzaam?', 'Ja, we richten ons op duurzaamheid.'),
+('Werken jullie op locatie?', 'Ja, op afstand en locatie.');
