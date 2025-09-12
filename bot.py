@@ -1,3 +1,6 @@
+#aan GITHUB gekoppeld test 5
+
+
 # Vereiste packages installeren:
 # pip install discord.py mysql-connector-python
 #pip install psutil
