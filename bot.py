@@ -43,7 +43,7 @@
 
 import discord
 import random
-import socket  # Voor DNS-resolutie
+import socket  # Voor DNS-resolutie en wake up lan 
 import urllib.request  # Voor IP-opvraag
 import mysql.connector
 from discord.ext import commands
@@ -53,6 +53,8 @@ from discord.ext import tasks
 import psutil
 import datetime
 import asyncio
+
+import re #voor wakeup lan 
 
 
 # Kanaal-ID waar dashboard gepost wordt
@@ -499,6 +501,105 @@ async def on_ready():
         await channel.send("✅ Bot is opnieuw opgestart en klaar om te gebruiken!")
     update_dashboard.start()
 
+
+
+
+
+#########################################################wake on lan#########################################################
+
+
+# voor als je iedereen zelf zijn mac moet invoeren
+
+
+# # --- Hulpfunctie Wake-on-LAN ---
+# def send_wol(mac: str):
+#     """
+#     Stuurt een Wake-on-LAN (WOL) magic packet.
+#     - mac: MAC-adres van de server, bv. "AA:BB:CC:DD:EE:FF"
+#     Werkt alleen als de bot in hetzelfde LAN zit als de server.
+#     """
+#     # MAC-adres schoonmaken (alleen hex-tekens)
+#     mac_clean = re.sub(r'[^0-9A-Fa-f]', '', mac)
+#     if len(mac_clean) != 12:
+#         raise ValueError("Ongeldig MAC-adres. Voorbeeld: AA:BB:CC:DD:EE:FF")
+    
+#     # Magic packet samenstellen: 6x 0xFF + 16x MAC
+#     mac_bytes = bytes.fromhex(mac_clean)
+#     packet = b'\xff' * 6 + mac_bytes * 16
+
+#     # UDP socket voor broadcast
+#     with socket.socket(socket.AF_INET, socket.SOCK_DGRAM) as s:
+#         s.setsockopt(socket.SOL_SOCKET, socket.SO_BROADCAST, 1)
+#         s.sendto(packet, ("255.255.255.255", 9))  # Standaard WOL-poort is 9
+
+# # --- Slash-command voor WOL ---
+# @bot.tree.command(name="wake", description="Weet een server in je LAN wakker")
+# @app_commands.describe(mac="MAC-adres van de server (AA:BB:CC:DD:EE:FF)")
+# async def slash_wake(interaction: discord.Interaction, mac: str):
+#     """
+#     - Gebruiker typt /wake <MAC>
+#     - Bot verstuurt magic packet naar server
+#     """
+#     await interaction.response.defer(thinking=True)
+#     try:
+#         send_wol(mac)
+#         await interaction.followup.send(f"✅ Magic packet verzonden naar `{mac}`", ephemeral=True)
+#     except Exception as e:
+#         await interaction.followup.send(f"❌ Kon WOL niet versturen: `{e}`", ephemeral=True)
+
+# # --- Optioneel: prefix-command !wake ---
+# @bot.command(name="wake")
+# async def wake_cmd(ctx, mac: str):
+#     """
+#     Zelfde als slash-command, maar via !wake <MAC>
+#     """
+#     try:
+#         send_wol(mac)
+#         await ctx.send(f"✅ Magic packet verzonden naar `{mac}`")
+#     except Exception as e:
+#         await ctx.send(f"❌ Kon WOL niet versturen: `{e}`")
+
+
+#########################################################wake on lan#########################################################
+
+
+
+# --- Stel je server-MAC hier in ---
+SERVER_MAC = "90-FB-A6-80-08-C4"
+
+# Hulpfunctie Wake-on-LAN
+def send_wol(mac: str):
+    import socket, re
+    mac_clean = re.sub(r'[^0-9A-Fa-f]', '', mac)
+    if len(mac_clean) != 12:
+        raise ValueError("Ongeldig MAC-adres. Voorbeeld: AA:BB:CC:DD:EE:FF")
+    mac_bytes = bytes.fromhex(mac_clean)
+    packet = b'\xff' * 6 + mac_bytes * 16
+    with socket.socket(socket.AF_INET, socket.SOCK_DGRAM) as s:
+        s.setsockopt(socket.SOL_SOCKET, socket.SO_BROADCAST, 1)
+        s.sendto(packet, ("255.255.255.255", 9))
+
+# Slash-command zonder parameter
+@bot.tree.command(name="wake", description="Weet de server wakker")
+async def slash_wake(interaction: discord.Interaction):
+    await interaction.response.defer(thinking=True)
+    try:
+        send_wol(SERVER_MAC)  # <--- Vaste MAC wordt gebruikt
+        await interaction.followup.send(f"✅ Magic packet verzonden naar server `{SERVER_MAC}`", ephemeral=True)
+    except Exception as e:
+        await interaction.followup.send(f"❌ Kon WOL niet versturen: `{e}`", ephemeral=True)
+
+# Prefix-command !wake
+@bot.command(name="wake")
+async def wake_cmd(ctx):
+    try:
+        send_wol(SERVER_MAC)  # <--- Vaste MAC wordt gebruikt
+        await ctx.send(f"✅ Magic packet verzonden naar server `{SERVER_MAC}`")
+    except Exception as e:
+        await ctx.send(f"❌ Kon WOL niet versturen: `{e}`")
+
+
+################wake on lan einde######################### 
 
 # Start de bot
 bot.run("MTM2MTk3NDAzNjQyMjIwMTM4NA.GVvq-F.C22fIfMfMyFyiv3FTNQzZAAUeR_bj43idbibPw")  # Vergeet je token niet te beveiligen!
