@@ -1,6 +1,6 @@
 #aan GITHUB gekoppeld test 6
 #aan argoCD gekoppeld test 1
-#argocdtest 7
+#argocdtest 8
 
 # Vereiste packages installeren:
 # pip install discord.py mysql-connector-python
