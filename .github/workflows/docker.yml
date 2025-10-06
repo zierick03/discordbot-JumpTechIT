@@ -3,24 +3,30 @@ name: Build and Push Docker Image
 on:
   push:
     branches:
-      - main
+      - main # Deze workflow draait telkens wanneer er code naar de 'main' branch gepusht wordt
 
 jobs:
-  build:
-    runs-on: ubuntu-latest
+  build:  # Eén job met de naam 'build'
+    runs-on: ubuntu-latest  # De job draait in een virtuele Ubuntu omgeving zou hier een versie kunnen aangeven voor een beter overzicht van wat je gebruikt 
 
     steps:
     - name: Checkout repository
       uses: actions/checkout@v3
+         # Haalt de code van je repository binnen, zodat de volgende stappen er toegang toe hebben
 
     - name: Log in to Docker Hub
       uses: docker/login-action@v2
       with:
         username: ${{ secrets.DOCKER_USERNAME }}
         password: ${{ secrets.DOCKER_PASSWORD }}
+             # Logt in bij Docker Hub met je gebruikersnaam en wachtwoord (die bewaard zijn als GitHub Secrets)
+
 
     - name: Build Docker image
       run: docker build -t ${{ secrets.DOCKER_USERNAME }}/discordbot:latest .
+       # Bouwt een Docker image vanuit je Dockerfile in de root van de repo
+      # Het image krijgt de naam: <DOCKER_USERNAME>/discordbot:latest
 
     - name: Push Docker image
       run: docker push ${{ secrets.DOCKER_USERNAME }}/discordbot:latest
+      # Pusht het gebouwde image naar Docker Hub onder jouw account
