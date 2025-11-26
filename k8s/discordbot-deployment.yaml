@@ -1,0 +1,40 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: discordbot
+  namespace: default
+  labels:
+    app: discordbot
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: discordbot
+  template:
+    metadata:
+      labels:
+        app: discordbot
+    spec:
+      containers:
+        - name: discordbot
+          image: zierick03/discordbot:latest
+          imagePullPolicy: Always
+          ports:
+            - containerPort: 8080
+      imagePullSecrets:
+        - name: discordbot-secret
+
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: discordbot
+  namespace: default
+spec:
+  selector:
+    app: discordbot
+  type: NodePort
+  ports:
+    - port: 8080
+      targetPort: 8080
+      nodePort: 30480
