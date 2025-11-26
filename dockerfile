@@ -1,4 +1,5 @@
 # Gebruik een officieel Python 3.10 image
+FROM python:3.14.0rc3
 FROM python:3.14.0
 
 # Maak een directory voor je app in de container
