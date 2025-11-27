@@ -7,7 +7,7 @@ services:
     depends_on:
       - mysql
     environment:
-      DISCORD_TOKEN: "MTM2MTk3NDAzNjQyMjIwMTM4NA.GVvq-F.C22fIfMfMyFyiv3FTNQzZAAUeR_bj43idbibPw"  # Voeg je eigen Discord token hier in
+      DISCORD_TOKEN: "DISCORD_TOKEN"  # Voeg je eigen Discord token hier in
 
   mysql:
     image: mysql:8.0

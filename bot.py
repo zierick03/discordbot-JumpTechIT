@@ -5,6 +5,9 @@
 # Vereiste packages installeren:
 # pip install discord.py mysql-connector-python
 #pip install psutil
+#pip install python-dotenv
+#python3 -m pip install python-dotenv
+
 #C:\Python312\python.exe -m pip install -U discord.py
 #C:\Python312\python.exe -m pip install mysql-connector-python
 #C:\Python312\python.exe -m pip install psutil
@@ -55,6 +58,9 @@ import datetime
 import asyncio
 
 import re #voor wakeup lan 
+
+import os #veiligheid token
+from dotenv import load_dotenv #veiligheid token
 
 
 # Kanaal-ID waar dashboard gepost wordt
@@ -620,5 +626,15 @@ async def wake_cmd(ctx):
 
 ################wake on lan einde######################### 
 
-# Start de bot
-bot.run("MTM2MTk3NDAzNjQyMjIwMTM4NA.GVvq-F.C22fIfMfMyFyiv3FTNQzZAAUeR_bj43idbibPw")  # Vergeet je token niet te beveiligen! normaal zou ik deze in een variable zetten in een beveiligde omgeving maar hier nog geen tijd voor gehad omdat ik veel veranderingen mdoe en hij slecht werkte in een variable
+
+
+
+load_dotenv('.env.local')  # laad de variabelen uit je bestand
+TOKEN = os.getenv("DISCORD_TOKEN")  # lees de variabele
+bot.run(TOKEN)  # start de bot
+
+
+
+
+# # Start de bot
+# bot.run("DISCORD_TOKEN")  # Vergeet je token niet te beveiligen!
