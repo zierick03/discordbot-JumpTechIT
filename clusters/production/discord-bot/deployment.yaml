@@ -18,13 +18,46 @@ spec:
         image: zierick03/discordbot:latest
         imagePullPolicy: Always
         env:
-        - name: DISCORD_TOKEN
-          valueFrom:
-            secretKeyRef:
-              name: discord-bot-secret
-              key: token
+          - name: DISCORD_TOKEN
+            valueFrom:
+              secretKeyRef:
+                name: discord-bot-secret
+                key: token
       imagePullSecrets:
-      - name: dockerhub-secret
+        - name: dockerhub-secret
+
+
+
+
+
+
+# apiVersion: apps/v1
+# kind: Deployment
+# metadata:
+#   name: discord-bot
+#   namespace: discord-bot
+# spec:
+#   replicas: 1
+#   selector:
+#     matchLabels:
+#       app: discord-bot
+#   template:
+#     metadata:
+#       labels:
+#         app: discord-bot
+#     spec:
+#       containers:
+#       - name: discord-bot
+#         image: zierick03/discordbot:latest
+#         imagePullPolicy: Always
+#         env:
+#         - name: DISCORD_TOKEN
+#           valueFrom:
+#             secretKeyRef:
+#               name: discord-bot-secret
+#               key: token
+#       imagePullSecrets:
+#       - name: dockerhub-secret
 
 
 
