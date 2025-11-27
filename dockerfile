@@ -1,24 +1,50 @@
-FROM python:3.11-slim
+FROM python:3.14.0
 
-# Installeer systeem-dependencies die nodig zijn voor audio en andere modules
+WORKDIR /bot
+
+# Systeem packages installeren die audioop en andere modules nodig hebben
 RUN apt-get update && apt-get install -y \
     build-essential \
     libffi-dev \
     libsndfile1 \
     && rm -rf /var/lib/apt/lists/*
 
-# Maak een directory voor de bot
-WORKDIR /bot
-
-# Kopieer requirements en installeer Python-dependencies
+# Kopieer requirements en installeer Python dependencies
 COPY requirements.txt /bot/requirements.txt
 RUN pip install --no-cache-dir -r /bot/requirements.txt
 
 # Kopieer de volledige applicatie
 COPY . /bot
 
-# Start de bot
+EXPOSE 8080
+
 CMD ["python", "bot.py"]
+
+
+
+
+
+# FROM python:3.11-slim
+
+# # Installeer systeem-dependencies die nodig zijn voor audio en andere modules
+# RUN apt-get update && apt-get install -y \
+#     build-essential \
+#     libffi-dev \
+#     libsndfile1 \
+#     && rm -rf /var/lib/apt/lists/*
+
+# # Maak een directory voor de bot
+# WORKDIR /bot
+
+# # Kopieer requirements en installeer Python-dependencies
+# COPY requirements.txt /bot/requirements.txt
+# RUN pip install --no-cache-dir -r /bot/requirements.txt
+
+# # Kopieer de volledige applicatie
+# COPY . /bot
+
+# # Start de bot
+# CMD ["python", "bot.py"]
 
 
 
